@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>WoW Wordle</title>
+  <style>
+    body {
+      background-color: #0c0c0c;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 30px;
+    }
+    img.logo {
+      max-width: 300px;
+      height: auto;
+      margin-bottom: 20px;
+    }
+    h1 {
+      color: gold;
+      text-shadow: 2px 2px #000;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(5, 50px);
+      gap: 5px;
+      margin-top: 20px;
+    }
+    .cell {
+      width: 50px;
+      height: 50px;
+      border: 2px solid #555;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    .correct { background-color: #538d4e; }
+    .present { background-color: #b59f3b; }
+    .absent { background-color: #3a3a3c; }
+    #inputArea {
+      margin-top: 20px;
+    }
+    input {
+      font-size: 18px;
+      padding: 5px;
+      width: 120px;
+      text-transform: uppercase;
+    }
+    button {
+      font-size: 18px;
+      padding: 5px 10px;
+      margin-left: 10px;
+      cursor: pointer;
+    }
+    #instructions {
+      margin-top: 30px;
+      max-width: 500px;
+      text-align: center;
+      font-size: 14px;
+      color: #ccc;
+    }
+  </style>
+</head>
+<body>
+  <!-- Logo -->
+  <img src="https://i.imgur.com/iXWPZL6.png" alt="Blizzard Video Logo" class="logo">
+
+  <h1>WoW Wordle</h1>
+  <div id="game" class="grid"></div>
+  <div id="inputArea">
+    <input type="text" id="guess" maxlength="5">
+    <button id="guessBtn">Guess</button>
+  </div>
+  <div id="instructions">
+    <p>Guess the 5-letter word in 6 tries. After each guess, the tiles will change color to show how close your guess was:</p>
+    <ul>
+      <li><span style="color:#538d4e; font-weight:bold;">Green</span> - Correct letter in the correct spot.</li>
+      <li><span style="color:#b59f3b; font-weight:bold;">Yellow</span> - Correct letter in the wrong spot.</li>
+      <li><span style="color:#3a3a3c; font-weight:bold;">Gray</span> - Letter not in the word.</li>
+    </ul>
+  </div>
+
+  <script>
+    const answer = "mages"; // Fixed for testing
+    const maxGuesses = 6;
+    let currentRow = 0;
+
+    const gameDiv = document.getElementById('game');
+
+    function createGrid() {
+      for (let i = 0; i < maxGuesses * 5; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        gameDiv.appendChild(cell);
+      }
+    }
+
+    function submitGuess() {
+      const input = document.getElementById('guess');
+      const guess = input.value.toLowerCase();
+
+      if (guess.length !== 5) {
+        alert("Your guess must be exactly 5 letters!");
+        return;
+      }
+
+      if (currentRow >= maxGuesses) return;
+
+      const startIndex = currentRow * 5;
+      for (let i = 0; i < 5; i++) {
+        const cell = gameDiv.children[startIndex + i];
+        cell.textContent = guess[i].toUpperCase();
+        if (guess[i] === answer[i]) {
+          cell.classList.add('correct');
+        } else if (answer.includes(guess[i])) {
+          cell.classList.add('present');
+        } else {
+          cell.classList.add('absent');
+        }
+      }
+
+      currentRow++;
+      input.value = '';
+
+      if (guess === answer) {
+        setTimeout(() => alert("Victory! For Azeroth!"), 50);
+      } else if (currentRow >= maxGuesses) {
+        setTimeout(() => alert("Defeat! The word was: " + answer.toUpperCase()), 50);
+      }
+    }
+
+    document.getElementById('guessBtn').addEventListener('click', submitGuess);
+    document.getElementById('guess').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        submitGuess();
+      }
+    });
+
+    createGrid();
+  </script>
+</body>
+</html>
